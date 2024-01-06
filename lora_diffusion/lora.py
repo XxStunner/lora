@@ -8,6 +8,7 @@ import PIL
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from diffusers.models.lora import LoRACompatibleLinear
 
 try:
     from safetensors.torch import safe_open
@@ -743,12 +744,11 @@ def monkeypatch_or_replace_lora_extended(
     for _module, name, _child_module in _find_modules(
         model,
         target_replace_module,
-        search_class=[nn.Linear, LoraInjectedLinear, nn.Conv2d, LoraInjectedConv2d],
+        search_class=[nn.Linear, LoraInjectedLinear, LoRACompatibleLinear, nn.Conv2d, LoraInjectedConv2d],
     ):
+        _tmp = None
 
-        if (_child_module.__class__ == nn.Linear) or (
-            _child_module.__class__ == LoraInjectedLinear
-        ):
+        if _child_module.__class__ in {nn.Linear, LoraInjectedLinear, LoRACompatibleLinear}:
             if len(loras[0].shape) != 2:
                 continue
 
