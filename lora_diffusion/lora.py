@@ -51,11 +51,32 @@ class LoraInjectedLinear(nn.Module):
         nn.init.zeros_(self.lora_up.weight)
 
     def forward(self, input, scale: float = 1.0):
-        return (
-            self.linear(input)
-            + self.dropout(self.lora_up(self.selector(self.lora_down(input))))
-            * self.scale
-        )
+        print(f"Initial input shape: {input.shape}")
+        linear_output = self.linear(input)
+        print(f"Shape after self.linear: {linear_output.shape}")
+        
+        lora_down_output = self.lora_down(input)
+        print(f"Shape after self.lora_down: {lora_down_output.shape}")
+        
+        selector_output = self.selector(lora_down_output)
+        print(f"Shape after self.selector: {selector_output.shape}")
+        
+        lora_up_output = self.lora_up(selector_output)
+        print(f"Shape after self.lora_up: {lora_up_output.shape}")
+        
+        dropout_output = self.dropout(lora_up_output)
+        print(f"Shape after self.dropout: {dropout_output.shape}")
+        
+        final_output = dropout_output * self.scale + linear_output
+        print(f"Final output shape: {final_output.shape}")
+        
+        return final_output
+        # assert torch.is_tensor(self.scale) and self.scale.numel() == 1, "scale should be a scalar tensor"
+        # return (
+        #     self.linear(input)
+        #     + self.dropout(self.lora_up(self.selector(self.lora_down(input))))
+        #     * self.scale
+        # )
 
     def realize_as_lora(self):
         return self.lora_up.weight.data * self.scale, self.lora_down.weight.data
