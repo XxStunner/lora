@@ -210,6 +210,7 @@ def _find_modules_v2(
         LoraInjectedLinear,
         LoraInjectedConv2d,
     ],
+    debug=False
 ):
     """
     Find all modules of a certain class (or union of classes) that are direct or
@@ -230,15 +231,24 @@ def _find_modules_v2(
         # this, incase you want to naively iterate over all modules.
         ancestors = [module for module in model.modules()]
 
-    print("_find_modules_v2", {
-        "ancestor_class": ancestor_class,
-        "search_class": search_class,
-        "ancestors": ancestors,
-    })
-
+    if debug:
+        print("_find_modules_v2", {
+            "ancestor_class": ancestor_class,
+            "search_class": search_class,
+            "ancestors": ancestors,
+        })
     # For each target find every linear_class module that isn't a child of a LoraInjectedLinear
     for ancestor in ancestors:
+        if debug:
+            print("loop_ancestor", {
+                "ancestor": ancestor,
+            })
         for fullname, module in ancestor.named_modules():
+            if debug:
+                print("loop_module", {
+                    "fullname": fullname,
+                    "module": module,
+                })
             if any([isinstance(module, _class) for _class in search_class]):
                 # Find the direct parent if this is a descendant, not a child, of target
                 *path, name = fullname.split(".")
@@ -250,11 +260,11 @@ def _find_modules_v2(
                     [isinstance(parent, _class) for _class in exclude_children_of]
                 ):
                     continue
-                print("yielding", {
-                    "parent": parent,
-                    "name": name,
-                    "module": module,
-                })
+                # print("yielding", {
+                #     "parent": parent,
+                #     "name": name,
+                #     "module": module,
+                # })
                 # Otherwise, yield it
                 yield parent, name, module
 
@@ -750,6 +760,7 @@ def monkeypatch_or_replace_lora_extended(
         model,
         target_replace_module,
         search_class=[nn.Linear, LoraInjectedLinear, LoRACompatibleLinear, nn.Conv2d, LoraInjectedConv2d],
+        debug=True,
     ):
         _tmp = None
 
