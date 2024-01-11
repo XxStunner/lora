@@ -230,6 +230,12 @@ def _find_modules_v2(
         # this, incase you want to naively iterate over all modules.
         ancestors = [module for module in model.modules()]
 
+    print("_find_modules_v2", {
+        "ancestor_class": ancestor_class,
+        "search_class": search_class,
+        "ancestors": ancestors,
+    })
+
     # For each target find every linear_class module that isn't a child of a LoraInjectedLinear
     for ancestor in ancestors:
         for fullname, module in ancestor.named_modules():
@@ -244,6 +250,11 @@ def _find_modules_v2(
                     [isinstance(parent, _class) for _class in exclude_children_of]
                 ):
                     continue
+                print("yielding", {
+                    "parent": parent,
+                    "name": name,
+                    "module": module,
+                })
                 # Otherwise, yield it
                 yield parent, name, module
 
