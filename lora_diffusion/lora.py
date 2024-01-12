@@ -761,7 +761,7 @@ def monkeypatch_or_replace_lora_extended(
         target_replace_module,
         search_class=[nn.Linear, LoraInjectedLinear, nn.Conv2d, LoraInjectedConv2d],
         # search_class=[nn.Linear, LoraInjectedLinear, LoRACompatibleLinear, nn.Conv2d, LoraInjectedConv2d],
-        debug=True,
+        # debug=True,
     ):
         _tmp = None
 
