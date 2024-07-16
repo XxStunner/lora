@@ -113,6 +113,8 @@ class LoRAManager:
 
         monkeypatch_or_replace_safeloras(self.pipe, self.total_safelora)
         tok_dict = parse_safeloras_embeds(self.total_safelora)
+        
+        print("tok_dict", tok_dict.keys())
 
         apply_learned_embed_in_clip(
             tok_dict,
