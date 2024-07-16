@@ -625,8 +625,10 @@ def parse_safeloras_embeds(
     for key in safeloras.keys():
         # Only handle Textual Inversion embeds
         meta = metadata.get(key)
+        print("parse_safeloras_embed_meta", meta)
         if not meta or meta != EMBED_FLAG:
             continue
+        
 
         embeds[key] = safeloras.get_tensor(key)
 
