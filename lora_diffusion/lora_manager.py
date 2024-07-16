@@ -67,6 +67,8 @@ def lora_join(lora_safetenors: list):
             print(f"Embedding {token} replaced to <s{idx}-{jdx}>")
 
         token_size_list.append(len(tokens))
+        
+    print("Token size list", token_size_list)
 
     return total_tensor, total_metadata, ranklist, token_size_list
 
